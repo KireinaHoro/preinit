@@ -5,6 +5,7 @@
 #include <cstring>
 #include <fstream>
 #include <unistd.h>
+#include <sys/stat.h>
 #include <sys/mount.h>
 
 #include "log_facility.h"
@@ -53,7 +54,7 @@ namespace klog {
       mkdir("/dev", S_IRWXU);
     }
     // mount devtmpfs
-    mount("none", "/dev", "devtmpfs", "");
+    mount("none", "/dev", "devtmpfs", 0, "");
 
     return check_log_facility();
   }
@@ -64,7 +65,7 @@ namespace klog {
       return;
     }
     std::ofstream out(kmsg_path);
-    auto *buffer = process_message(message);
+    auto *buffer = process_message(lvl, message);
     out << buffer;
     delete buffer;
   }

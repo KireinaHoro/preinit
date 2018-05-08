@@ -16,7 +16,7 @@ namespace klog {
     LOG_WARN,
     LOG_FATAL,
   };
-  const char (*log_level_strings)[] = {
+  const char *log_level_strings[] = {
     "[DEBUG] ",
     "[INFO ] ",
     "[WARN ] ",
@@ -32,7 +32,7 @@ namespace klog {
   // check and setup /dev/kmsg
   bool setup_log_facility();
 
-  void log_to_facility_with_level(log_level lvl, const char *message)
+  void log_to_facility_with_level(log_level lvl, const char *message);
 }
 
 #define SLOGD(msg) klog::log_to_facility_with_level(LOG_DEBUG, msg)
