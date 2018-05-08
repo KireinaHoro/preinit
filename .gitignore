@@ -4,5 +4,6 @@
 \#*\#
 **/\#*\#
 
-# ignore all object files
+# ignore all object files and target files
 **/*.o
+out/*
