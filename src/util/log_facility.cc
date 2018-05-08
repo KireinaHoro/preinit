@@ -15,6 +15,18 @@
 // and not checking for other possible errors here.
 
 namespace klog {
+  bool setup_finished = false;
+
+  const char *kmsg_path = "/dev/kmsg";
+  const char *log_prefix = "new_era ";
+
+  const char *log_level_strings[] = {
+    "[DEBUG] ",
+    "[INFO ] ",
+    "[WARN ] ",
+    "[FATAL] ",
+  };
+
   char *process_message(log_level lvl, const char *message) {
     const char *log_level_string = log_level_strings[lvl];
 
