@@ -18,6 +18,7 @@ namespace klog {
   void log_to_facility_with_level(log_level lvl, std::string message);
 }
 
+#define FMT_HEADER_ONLY
 #include <fmt/format.h>
 
 #define SLOGD(...) klog::log_to_facility_with_level(klog::LOG_DEBUG, fmt::format(__VA_ARGS__))
