@@ -4,6 +4,10 @@
 \#*\#
 **/\#*\#
 
+# ignore vim temp files
+.*.swp
+**/.*.swp
+
 # ignore all object files and target files
 **/*.o
 out/*
