@@ -18,9 +18,11 @@ _DEPS	= util/log_facility.o
 _OBJS	= $(addsuffix .o,$(_TARGETS)) $(_DEPS)
 OBJS	= $(patsubst %,$(SRCDIR)/%,$(_OBJS))
 
+LIBS	=
+
 $(TARGETS) : $(OBJS)
 	$(MKDIR)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LIBS)
 	$(STRIP) $@
 
 $(SRCDIR)/%.o : $(SRCDIR)/%.cpp $(INCDIR)/%.h
