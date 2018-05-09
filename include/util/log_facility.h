@@ -5,6 +5,8 @@
 #ifndef LOG_FACILITY_H
 #define LOG_FACILITY_H
 
+#include <string>
+
 namespace klog {
   enum log_level {
     LOG_DEBUG,
@@ -13,12 +15,14 @@ namespace klog {
     LOG_FATAL,
   };
   // log to log facility, setting up things if necessary
-  void log_to_facility_with_level(log_level lvl, const char *message);
+  void log_to_facility_with_level(log_level lvl, std::string message);
 }
 
-#define SLOGD(msg) klog::log_to_facility_with_level(klog::LOG_DEBUG, msg)
-#define SLOGI(msg) klog::log_to_facility_with_level(klog::LOG_INFO, msg)
-#define SLOGW(msg) klog::log_to_facility_with_level(klog::LOG_WARN, msg)
-#define SLOGE(msg) klog::log_to_facility_with_level(klog::LOG_FATAL, msg)
+#include <fmt/format.h>
+
+#define SLOGD(...) klog::log_to_facility_with_level(klog::LOG_DEBUG, fmt::format(__VA_ARGS__))
+#define SLOGI(...) klog::log_to_facility_with_level(klog::LOG_INFO, fmt::format(__VA_ARGS__))
+#define SLOGW(...) klog::log_to_facility_with_level(klog::LOG_WARN, fmt::format(__VA_ARGS__))
+#define SLOGE(...) klog::log_to_facility_with_level(klog::LOG_FATAL, fmt::format(__VA_ARGS__))
 
 #endif

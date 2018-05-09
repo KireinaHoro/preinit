@@ -27,7 +27,7 @@ namespace klog {
     "[FATAL] ",
   };
 
-  std::string process_message(log_level lvl, const char *message) {
+  std::string process_message(log_level lvl, std::string message) {
     return log_prefix + log_level_strings[lvl] + message;
   }
 
@@ -63,7 +63,7 @@ namespace klog {
     return check_log_facility();
   }
 
-  void log_to_facility_with_level(log_level lvl, const char *message) {
+  void log_to_facility_with_level(log_level lvl, std::string message) {
     if (!setup_log_facility()) {
       // the log facility failed to get ready -- return
       return;
