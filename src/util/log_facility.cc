@@ -2,7 +2,7 @@
 //
 // 2018 KireinaHoro <i@jsteward.moe>
 
-#include <cstring>
+#include <string>
 #include <fstream>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -17,26 +17,18 @@
 namespace klog {
   bool setup_finished = false;
 
-  const char *kmsg_path = "/dev/kmsg";
-  const char *log_prefix = "new_era ";
+  const std::string kmsg_path = "/dev/kmsg";
+  const std::string log_prefix = "new_era: ";
 
-  const char *log_level_strings[] = {
+  const std::string log_level_strings[] = {
     "[DEBUG] ",
     "[INFO ] ",
     "[WARN ] ",
     "[FATAL] ",
   };
 
-  char *process_message(log_level lvl, const char *message) {
-    const char *log_level_string = log_level_strings[lvl];
-
-    auto total_len = std::strlen(log_prefix) + std::strlen(log_level_string) + std::strlen(message) + 1;
-    auto ret_buffer = new char[total_len];
-    std::strcpy(ret_buffer, log_prefix);
-    std::strcpy(ret_buffer, log_level_string);
-    std::strcpy(ret_buffer, message);
-
-    return ret_buffer;
+  std::string process_message(log_level lvl, const char *message) {
+    return log_prefix + log_level_strings[lvl] + message;
   }
 
   bool check_log_facility() {
@@ -44,7 +36,7 @@ namespace klog {
     // we can assume that a working /dev has been set up
     if (setup_finished) { return true; }
     struct stat buffer;
-    setup_finished = (stat(kmsg_path, &buffer) == 0);
+    setup_finished = (stat(kmsg_path.c_str(), &buffer) == 0);
     return setup_finished;
   }
 
@@ -77,9 +69,8 @@ namespace klog {
       return;
     }
     std::ofstream out(kmsg_path);
-    auto *buffer = process_message(lvl, message);
-    out << buffer;
-    delete buffer;
+    auto buffer = process_message(lvl, message);
+    out << buffer << std::endl;
   }
 }
     
