@@ -8,7 +8,7 @@ CC	= $(CHOST)-gcc
 CXX	= $(CHOST)-g++
 STRIP	= $(CHOST)-strip
 CFLAGS	= -I$(INCDIR) -static
-CXXFLAGS= $(CFLAGS) -Wall
+CXXFLAGS= $(CFLAGS) -Wall -std=c++17
 
 _TARGETS= init
 TARGETS	= $(patsubst %,$(OUTDIR)/%,$(_TARGETS))
@@ -23,13 +23,14 @@ $(TARGETS) : $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
 	$(STRIP) $@
 
-parentdir = $(notdir $(abspath $(dir $1)))
+$(SRCDIR)/%.o : $(SRCDIR)/%.cpp $(INCDIR)/%.h
+	$(CXX) -c $(CXXFLAGS) -I$(INCDIR)/$(dir $*) -o $@ $<
 
 $(SRCDIR)/%.o : $(SRCDIR)/%.cc $(INCDIR)/%.h
-	$(CXX) -c $(CXXFLAGS) -I$(INCDIR)/$(call parentdir,$@) -o $@ $<
+	$(CXX) -c $(CXXFLAGS) -I$(INCDIR)/$(dir $*) -o $@ $<
 
 $(SRCDIR)/%.o : $(SRCDIR)/%.c $(INCDIR)/%.h
-	$(CC) -c $(CFLAGS) -I$(INCDIR)/$(call parentdir,$@) -o $@ $<
+	$(CC) -c $(CFLAGS) -I$(INCDIR)/$(dir $*) -o $@ $<
 
 .PHONY : clean
 clean :
