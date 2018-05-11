@@ -21,12 +21,24 @@
 #define KDF_SCRYPT 2
 #define KDF_SCRYPT_KEYMASTER 5
 
+// keymaster constants
+#define RSA_KEY_SIZE_BYTES 
+
 namespace crypto {
+  namespace keymaster {
+    // sign object with keymaster for cryptfs
+    static int keymaster_sign_object(struct crypt_mnt_ftr *ftr,
+				     const unsigned char *object,
+				     const size_t object_size,
+				     unsigned char **signature,
+				     size_t *signature_size);
+  }
+
   // decrypt userdata partition, returning path to decrypted block device
   std::string decrypt_userdata();
 
   using kdf_func = int(*)(const char *password, const unsigned char *salt,
-  			  unsigned char *ikey, void *params);
+			  unsigned char *ikey, void *params);
 
   using __le8 = unsigned char;
 
@@ -38,22 +50,22 @@ namespace crypto {
     __le32 flags;         /* See above */
     __le32 keysize;       /* in bytes */
     __le32 crypt_type;    /* how master_key is encrypted. Must be a
-                           * CRYPT_TYPE_XXX value */
+			   * CRYPT_TYPE_XXX value */
     __le64 fs_size;       /* Size of the encrypted fs, in 512 byte sectors */
     __le32 failed_decrypt_count; /* count of # of failed attempts to decrypt and
-                                    mount, set to 0 on successful mount */
+				    mount, set to 0 on successful mount */
     unsigned char crypto_type_name[MAX_CRYPTO_TYPE_NAME_LEN]; /* The type of encryption
-                                                                 needed to decrypt this
-                                                                 partition, null terminated */
+								 needed to decrypt this
+								 partition, null terminated */
     __le32 spare2;        /* ignored */
     unsigned char master_key[MAX_KEY_LEN]; /* The encrypted key for decrypting the filesystem */
     unsigned char salt[SALT_LEN];   /* The salt used for this encryption */
     __le64 persist_data_offset[2];  /* Absolute offset to both copies of crypt_persist_data
-                                     * on device with that info, either the footer of the
-                                     * real_blkdevice or the metadata partition. */
+				     * on device with that info, either the footer of the
+				     * real_blkdevice or the metadata partition. */
   
     __le32 persist_data_size;       /* The number of bytes allocated to each copy of the
-                                     * persistent data table*/
+				     * persistent data table*/
   
     __le8  kdf_type; /* The key derivation function used. */
   
@@ -62,11 +74,11 @@ namespace crypto {
     __le8  r_factor; /* (1 << r) */
     __le8  p_factor; /* (1 << p) */
     __le64 encrypted_upto; /* If we are in state CRYPT_ENCRYPTION_IN_PROGRESS and
-                              we have to stop (e.g. power low) this is the last
-                              encrypted 512 byte sector.*/
+			      we have to stop (e.g. power low) this is the last
+			      encrypted 512 byte sector.*/
     __le8  hash_first_block[SHA256_DIGEST_LENGTH]; /* When CRYPT_ENCRYPTION_IN_PROGRESS
-                                                      set, hash of first block, used
-                                                      to validate before continuing*/
+						      set, hash of first block, used
+						      to validate before continuing*/
   
     /* key_master key, used to sign the derived key which is then used to generate
      * the intermediate key
@@ -88,13 +100,13 @@ namespace crypto {
        wrong, we simply won't recognise a right password, and will continue to
        prompt. On the first password change, this value will be populated and
        then we will be OK.
-     */
+    */
     unsigned char scrypted_intermediate_key[SCRYPT_LEN];
   
     /* sha of this structure with this element set to zero
        Used when encrypting on reboot to validate structure before doing something
        fatal
-     */
+    */
     unsigned char sha256[SHA256_DIGEST_LENGTH];
   };
 }
