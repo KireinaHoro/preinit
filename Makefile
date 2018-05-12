@@ -57,6 +57,7 @@ RAMDISK_OUT	= $(OUTDIR)/initrd-mod.img
 BOOTIMG_OUT	= $(OUTDIR)/boot-mod.img
 
 $(RAMDISK) : $(BOOTIMG)
+	$(MKDIR)
 	$(MKINITRAMFSDIR)
 	$(ABOOTIMG) -x $(BOOTIMG) $(BOOTIMGCFG) $(KERNEL) $(RAMDISK)
 
