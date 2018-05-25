@@ -1,0 +1,37 @@
+#!/bin/sh
+
+export PATH=/bin
+
+USERDATA=/dev/mmcblk0p44
+FSROOT=/mnt/userdata
+NEWROOT=$FSROOT/gnu
+NEWINIT=/sbin/init
+
+# write log to kmsg
+log() {
+	echo new_era: $@ > /dev/kmsg
+}
+
+die() {
+	log FATAL: $@
+	exit 1
+}
+
+# set up psuedo-filesystems
+mount -t devtmpfs none /dev
+mount -t proc none /proc
+mount -t sysfs none /sys
+
+log Preinit started!
+log Trying to mount $USERDATA on $FSROOT...
+mkdir -p $FSROOT
+mount -t ext4 $USERDATA $FSROOT || die Failed to mount $USERDATA
+
+log Setting up $NEWROOT as mountpoint...
+mount -o bind,ro $NEWROOT $NEWROOT || die Failed to setup $NEWROOT as mountpoint
+
+log Cleaning up mounts, switching root to $NEWROOT, and launching $NEWINIT...
+mount --move /proc $NEWROOT/proc
+mount --move /sys $NEWROOT/sys
+mount --move /dev $NEWROOT/dev
+exec switch_root $NEWROOT $NEWINIT
