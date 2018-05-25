@@ -4,7 +4,7 @@ export PATH=/bin
 
 USERDATA=/dev/mmcblk0p44
 FSROOT=/mnt/userdata
-NEWROOT=$FSROOT/gentoo
+NEWROOT=$FSROOT/gnu
 NEWINIT=/sbin/init
 
 # write log to kmsg
@@ -22,19 +22,15 @@ mount -t devtmpfs none /dev
 mount -t proc none /proc
 mount -t sysfs none /sys
 
-log Preinit started
+log Preinit started!
 log Trying to mount $USERDATA on $FSROOT...
 mkdir -p $FSROOT
-
-mount -t ext4 $USERDATA $FSROOT >/dev/kmsg 2>&1 || die Failed to mount $USERDATA
+mount -t ext4 $USERDATA $FSROOT || die Failed to mount $USERDATA
 
 log Setting up $NEWROOT as mountpoint...
-mount -o bind,ro $NEWROOT $NEWROOT >/dev/kmsg 2>&1 || die Failed to setup $NEWROOT as mountpoint
+mount -o bind,ro $NEWROOT $NEWROOT || die Failed to setup $NEWROOT as mountpoint
 
-log Checking destination init...
-log `ls -la $NEWINIT`
-
-log Cleaning up mounts and switching root to $NEWROOT and launching $NEWINIT...
+log Cleaning up mounts, switching root to $NEWROOT, and launching $NEWINIT...
 mount --move /proc $NEWROOT/proc
 mount --move /sys $NEWROOT/sys
 mount --move /dev $NEWROOT/dev
