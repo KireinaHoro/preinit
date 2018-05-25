@@ -11,4 +11,3 @@
 # ignore all object files and target files
 **/*.o
 out/*
-initramfs/*
