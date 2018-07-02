@@ -1,0 +1,100 @@
+# -*-eselect-*-  vim: ft=eselect
+# Copyright 2005-2018 Gentoo Foundation
+# Distributed under the terms of the GNU GPL version 2 or later
+
+DESCRIPTION="Manage the /usr/lib/preinit/current symlink"
+MAINTAINER="eselect@gentoo.org"
+VERSION="20180702"
+
+# find a list of kernel symlink targets
+find_targets() {
+    local f
+    for f in "${EROOT}"/usr/lib/preinit/devices/*; do
+        [[ -d ${f} ]] && basename "${f}"
+    done
+}
+
+# remove the kernel symlink
+remove_symlink() {
+    rm "${EROOT}/usr/lib/preinit/current"
+}
+
+# set the kernel symlink
+set_symlink() {
+    local target=$1
+
+    if is_number "${target}"; then
+        local targets=( $(find_targets) )
+        target=${targets[target-1]}
+    fi
+
+    [[ -z ${target} || ! -d ${EROOT}/usr/lib/preinit/devices/${target} ]] \
+        && die -q "Target \"$1\" doesn't appear to be valid!"
+
+    ln -s "${target}" "${EROOT}/usr/lib/preinit/current"
+}
+
+### show action ###
+
+describe_show() {
+    echo "Show the current preinit symlink"
+}
+
+do_show() {
+    write_list_start "Current preinit symlink:"
+    if [[ -L ${EROOT}/usr/lib/preinit/current ]]; then
+        local preinit=$(canonicalise "${EROOT}/usr/lib/preinit/current")
+        write_kv_list_entry "${preinit%/}" ""
+    else
+        write_kv_list_entry "(unset)" ""
+    fi
+}
+
+### list action ###
+
+describe_list() {
+    echo "List available preinit symlink targets"
+}
+
+do_list() {
+    local i targets=( $(find_targets) )
+
+    write_list_start "Available preinit symlink targets:"
+    for (( i = 0; i < ${#targets[@]}; i++ )); do
+        # highlight the target where the symlink is pointing to
+        [[ ${targets[i]} = \
+            $(basename "$(canonicalise "${EROOT}/usr/lib/preinit/current")") ]] \
+            && targets[i]=$(highlight_marker "${targets[i]}")
+    done
+    write_numbered_list -m "(none found)" "${targets[@]}"
+}
+
+### set action ###
+
+describe_set() {
+    echo "Set a new preinit symlink target"
+}
+
+describe_set_parameters() {
+    echo "<target>"
+}
+
+describe_set_options() {
+    echo "target : Target name or number (from 'list' action)"
+}
+
+do_set() {
+    [[ -z $1 ]] && die -q "You didn't tell me what to set the symlink to"
+    [[ $# -gt 1 ]] && die -q "Too many parameters"
+
+    if [[ -L ${EROOT}/usr/lib/preinit/current ]]; then
+        # existing symlink
+        remove_symlink || die -q "Couldn't remove existing symlink"
+        set_symlink "$1" || die -q "Couldn't set a new symlink"
+    elif [[ -e ${EROOT}/usr/lib/preinit/current ]]; then
+        # we have something strange
+        die -q "${EROOT}/usr/lib/preinit/current exists but is not a symlink"
+    else
+        set_symlink "$1" || die -q "Couldn't set a new symlink"
+    fi
+}
