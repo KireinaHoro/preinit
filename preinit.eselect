@@ -10,7 +10,7 @@ VERSION="20180702"
 find_targets() {
     local f
     for f in "${EROOT}"/usr/lib/preinit/devices/*; do
-        [[ -d ${f} ]] && echo "devices/$(basename \"${f}\")"
+        [[ -d ${f} ]] && basename "${f}"
     done
 }
 
@@ -31,7 +31,7 @@ set_symlink() {
     [[ -z ${target} || ! -d ${EROOT}/usr/lib/preinit/devices/${target} ]] \
         && die -q "Target \"$1\" doesn't appear to be valid!"
 
-    ln -s "${target}" "${EROOT}/usr/lib/preinit/current"
+    ln -s "devices/${target}" "${EROOT}/usr/lib/preinit/current"
 }
 
 ### show action ###
