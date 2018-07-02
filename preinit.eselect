@@ -10,7 +10,7 @@ VERSION="20180702"
 find_targets() {
     local f
     for f in "${EROOT}"/usr/lib/preinit/devices/*; do
-        [[ -d ${f} ]] && basename "${f}"
+        [[ -d ${f} ]] && echo "devices/$(basename \"${f}\")"
     done
 }
 
