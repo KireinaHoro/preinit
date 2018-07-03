@@ -2,7 +2,7 @@ all:
 	mkdir -p initramfs/{,s}bin
 	cp -L /bin/busybox initramfs/sbin/
 	for a in $$(initramfs/sbin/busybox --list-full); do \
-		ln -s /sbin/busybox initramfs/$$a; \
+		ln -sf /sbin/busybox initramfs/$$a; \
 		done
 	chmod 755 initramfs/init
 
