@@ -19,8 +19,6 @@ die() {
 
 # set up psuedo-filesystems
 mount -t devtmpfs none /dev
-mount -t proc none /proc
-mount -t sysfs none /sys
 
 log Preinit started!
 log Trying to mount $USERDATA on $FSROOT...
@@ -31,7 +29,5 @@ log Setting up $NEWROOT as mountpoint...
 mount -o bind,ro $NEWROOT $NEWROOT || die Failed to setup $NEWROOT as mountpoint
 
 log Cleaning up mounts, switching root to $NEWROOT, and launching $NEWINIT...
-mount --move /proc $NEWROOT/proc
-mount --move /sys $NEWROOT/sys
 mount --move /dev $NEWROOT/dev
 exec switch_root $NEWROOT $NEWINIT
